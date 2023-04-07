@@ -1,0 +1,6 @@
+go-all:
+	go get -u -t -v ./... || :
+	go work sync
+	go generate ./...
+	go test ./...
+	go mod tidy || :

@@ -1,0 +1,107 @@
+= Database configuration
+
+== Environments
+
+
+|===
+|Env name |Required|Default value
+
+|`DB_DIALECT`
+|no
+|postgres
+
+|`DB_HOST`
+|yes
+|
+
+|`DB_PORT`
+|no
+|5432
+
+|`DB_NAME`
+|yes
+|
+
+|`DB_SSL_MODE`
+|no
+|disable
+
+|`DB_MAX_IDLE_CONNECTIONS`
+|no
+|5
+
+|`DB_MAX_OPEN_CONNECTIONS`
+|no
+|15
+
+|`DB_MAX_LIFETIME_IN_MINUTES`
+|no
+|15
+
+|`DB_USER`
+|yes
+|
+
+|`DB_PASSWORD`
+|yes
+|
+
+|`SCHEMA_DB_USER`
+|no
+|env value `DB_USER`
+
+|`SCHEMA_DB_PASSWORD`
+|no
+|env value `DB_PASSWORD`
+
+|`GOOSE_MIGRATION_DIR`
+|no
+|/db/migrations
+|===
+
+== Конвенция работы с БД из сервисов
+. Для сущностей рекомендуется использование метода link:https://gorm.io/docs/conventions.html#TableName[`TableName`] и расширение от link:base-entity.go[BaseEntity]
++
+[sourse,go]
+====
+type MyEntity struct {
+	BaseEntity
+}
+
+func (MyEntity) TableName() string {
+	return "db-table-name"
+}
+====
+
+== Создание БД для сервиса
+. Создаём БД
++
+[source,postgresql]
+====
+CREATE DATABASE "DB_NAME";
+====
++
+. Добавляем extensions в созданную БД
++
+[source,postgresql]
+====
+CREATE EXTENSION "uuid-ossp";
+
+CREATE EXTENSION "pgcrypto";
+
+CREATE EXTENSION "citext";
+====
+
+== Политика наименований
+
+. в именах таблиц и полей в качестве разделителя используем подчёркивание
+. Индексы пишем с разделителем через дефис. `table_name-field_name-key`, где `key` - суффикс имени индекса
+. Primary Key индексы имеют суффикс `pkey`
+. Уникальные индексы имеют суффикс `udx`
+. Ссылочные индексы имеют суффикс `fk`
+. Все остальные индексы имеют суффикс `idx`
+. Для сумм используем тип `decimal` с указанием размерности и точности
+
+== TODO
+. See https://github.com/Ahmet-Kaplan/gorm-zerolog
+. Для Goose включить поддержку zerolog

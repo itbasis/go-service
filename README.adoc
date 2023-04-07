@@ -1,0 +1,37 @@
+= Каркас микросервиса
+
+Possibilities:
+
+. Поднятие HTTP сервера на базе link:https://gin-gonic.com/[gin]
+. Поднятие gRPC сервера
+. Взаимодействие с БД через link:https://gorm.io/[GORM]
+. Запуск заданий на базе link:https://github.com/go-co-op/gocron[gocron]
+. Различный формат лога, в зависимости от окружения запуска - в контейнере или нет
+. Получение настроек через link:https://github.com/caarlos0/env[env] переменные
+
+== ENV переменные окружений
+
+link:config.go[]
+
+link:db/config.go[] - подробнее в link:db/README.adoc[]
+
+Для чтения конфигурации рекомендуется использовать метод link:https://github.com/itbasis/go-core-utils/blob/main/env-reader.go[`ReadEnvConfig()`]
+
+== Примеры
+
+.Минимальная конфигурация кода для запуска
+[source,go]
+----
+NewServiceWithEnvironment().Run()
+----
+
+.Конфигурация с передачей скриптов для миграции БД через Embedded FS
+[source,go]
+----
+import "embed"
+
+//go:embed folder/*.sql
+var embedMigrations embed.FS
+
+NewServiceWithEnvironment().InitDB(&embedMigrations).Run()
+----
