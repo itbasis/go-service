@@ -3,12 +3,11 @@ package time_test
 import (
 	"context"
 	"fmt"
-	"testing"
 	"time"
 
 	serviceTimeUtils "github.com/itbasis/go-service/utils/time"
-	testUtils "github.com/itbasis/go-test-utils"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var testData = []struct {
@@ -19,54 +18,48 @@ var testData = []struct {
 	{string: "1993-12-23T10:24:41Z", time: time.Date(1993, time.December, 23, 10, 24, 41, 0, time.UTC)},
 }
 
-func TestTime2String(t *testing.T) {
-	for _, test := range testData {
-		t.Run(
-			test.string, func(t *testing.T) {
-				assert.Equal(t, test.string, *serviceTimeUtils.Time2String(test.time))
+var _ = Describe(
+	"Time2String", func() {
+		for idx, test := range testData {
+			It(
+				fmt.Sprintf("#%d: %s", idx, test.string), func() {
+					Ω(serviceTimeUtils.Time2String(test.time)).To(HaveValue(Equal(test.string)))
+				},
+			)
+		}
+	},
+)
+
+var _ = Describe(
+	"String2Time", func() {
+		for idx, test := range testData {
+			It(
+				fmt.Sprintf("#%d: %s", idx, test.string), func() {
+					Ω(serviceTimeUtils.String2Time(context.Background(), &test.string)).To(HaveValue(Equal(test.time)))
+				},
+			)
+		}
+
+		It(
+			"nil", func() {
+				actual, err := serviceTimeUtils.String2Time(context.Background(), nil)
+				Ω(actual).To(BeNil())
+				Ω(err).Should(MatchError("error parsing string to Time: '<nil>'"))
 			},
 		)
-	}
-}
 
-func TestString2Time_Success(t *testing.T) {
-	for _, test := range testData {
-		t.Run(
-			test.string, func(t *testing.T) {
-				actual, err := serviceTimeUtils.String2Time(testUtils.TestLoggerWithContext(context.Background()), &test.string)
-				assert.Nil(t, err)
-				assert.Equal(t, test.time, *actual)
+		DescribeTable(
+			"Fail", func(value, wantErr string) {
+				actual, err := serviceTimeUtils.String2Time(context.Background(), &value)
+				Ω(actual).To(BeNil())
+				Ω(err).Should(MatchError(wantErr))
 			},
+			Entry(nil, "", "error parsing string to Time: ''"),
+			Entry(nil, "t", "error parsing string to Time: 't'"),
+			Entry(nil, "2022", "error parsing string to Time: '2022'"),
+			Entry(nil, "20221228", "error parsing string to Time: '20221228'"),
+			Entry(nil, "2022-12-28", "error parsing string to Time: '2022-12-28'"),
+			Entry(nil, "2022-12-28 02:01:00", "error parsing string to Time: '2022-12-28 02:01:00'"),
 		)
-	}
-}
-
-func TestString2Time_Fail_Nil(t *testing.T) {
-	actual, err := serviceTimeUtils.String2Time(testUtils.TestLoggerWithContext(context.Background()), nil)
-	assert.Nil(t, actual)
-	assert.EqualError(t, err, "error parsing string to Time: '<nil>'")
-}
-
-func TestString2Time_Fail(t *testing.T) {
-	tests := []struct {
-		value     string
-		expectErr string
-	}{
-		{value: "", expectErr: "error parsing string to Time: ''"},
-		{value: "t", expectErr: "error parsing string to Time: 't'"},
-		{value: "2022", expectErr: "error parsing string to Time: '2022'"},
-		{value: "20221228", expectErr: "error parsing string to Time: '20221228'"},
-		{value: "2022-12-28", expectErr: "error parsing string to Time: '2022-12-28'"},
-		{value: "2022-12-28 02:01:00", expectErr: "error parsing string to Time: '2022-12-28 02:01:00'"},
-	}
-
-	for i, test := range tests {
-		t.Run(
-			fmt.Sprintf("%d: %s", i, test.value), func(t *testing.T) {
-				actual, err := serviceTimeUtils.String2Time(testUtils.TestLoggerWithContext(context.Background()), &test.value)
-				assert.Nil(t, actual)
-				assert.EqualError(t, err, test.expectErr)
-			},
-		)
-	}
-}
+	},
+)

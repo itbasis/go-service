@@ -36,6 +36,13 @@ func String2TimeWithCustomLayout(ctx context.Context, value *string, layout stri
 		return nil, errParsing
 	}
 
+	if *value == "" {
+		errParsing := fmt.Errorf("%w: ''", ErrParsingTime)
+		logger.Error().Err(errParsing).Msg("")
+
+		return nil, errParsing
+	}
+
 	result, err := time.ParseInLocation(layout, *value, GlobalTime)
 	if err != nil {
 		errParsing := fmt.Errorf("%w: '%s'", ErrParsingTime, *value)

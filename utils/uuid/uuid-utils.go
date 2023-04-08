@@ -1,4 +1,4 @@
-package utils
+package uuid
 
 import (
 	"context"
@@ -13,6 +13,7 @@ var ErrParsingUUID = errors.New("error parsing string to UUID")
 
 func String2UUID(ctx context.Context, value string) (uuid.UUID, error) {
 	logger := zerolog.Ctx(ctx)
+	logger.Debug().Msgf("value: %s", value)
 
 	result, err := uuid.FromString(value)
 	if err != nil {
