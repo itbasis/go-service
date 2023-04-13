@@ -7,7 +7,7 @@ require (
 	github.com/caarlos0/env/v7 v7.1.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-co-op/gocron v1.19.0
+	github.com/go-co-op/gocron v1.20.1
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
