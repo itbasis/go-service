@@ -1,4 +1,4 @@
-= Каркас микросервиса
+= Go microservice framework
 
 Possibilities:
 
