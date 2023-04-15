@@ -2,30 +2,39 @@
 
 Possibilities:
 
-. Поднятие HTTP сервера на базе link:https://gin-gonic.com/[gin]
-. Поднятие gRPC сервера
-. Взаимодействие с БД через link:https://gorm.io/[GORM]
-. Запуск заданий на базе link:https://github.com/go-co-op/gocron[gocron]
-. Различный формат лога, в зависимости от окружения запуска - в контейнере или нет
-. Получение настроек через link:https://github.com/caarlos0/env[env] переменные
+// suppress inspection "AsciiDocLinkResolve"
+. Running a link:https://gin-gonic.com/[gin] based HTTP/REST server ( see link:config.go#L10[config] )
+// suppress inspection "AsciiDocLinkResolve"
+. Running a gRPC server with metrics for Prometheus (see link:config.go#L14[config] and link:https://github
+.com/grpc-ecosystem/go-grpc-middleware/blob/main/providers/prometheus/options.go[options])
+. Working with the database via link:https://gorm.io/[GORM] with support for database migration via link:https://pressly.github.io/goose/[Goose] with the ability to specify migration files from the file system or via `embed.FS`
+. Using the link:https://github.com/go-co-op/gocron[gocron] task scheduler
+. Different log output format based on link:https://github.com/rs/zerolog[Zerolog], depending on the launch environment - launch in container or not
+. Getting settings via link:https://github.com/caarlos0/env[environment] variables
 
-== ENV переменные окружений
+== Configuration files
 
-link:config.go[]
+. link:config.go[]
 
-link:db/config.go[] - подробнее в link:db/README.adoc[]
+. link:db/config.go[] - more details in the link:db/README.adoc[]
 
-Для чтения конфигурации рекомендуется использовать метод link:https://github.com/itbasis/go-core-utils/blob/main/env-reader.go[`ReadEnvConfig()`]
+To read the configuration from the environment, it is recommended to use the method link:https://github.com/itbasis/go-core-utils/blob/main/env-reader.go[`ReadEnvConfig()`]
 
-== Примеры
+== TODO
 
-.Минимальная конфигурация кода для запуска
+see link:TODO.adoc[]
+
+== Examples
+
+.Minimum code configuration to run
 [source,go]
 ----
-NewServiceWithEnvironment().Run()
+func main() {
+	_ := NewServiceWithEnvironment().Run()
+}
 ----
 
-.Конфигурация с передачей скриптов для миграции БД через Embedded FS
+.Configuration with the transfer of migration scripts for database migration via Embedded FS
 [source,go]
 ----
 import "embed"
@@ -33,5 +42,38 @@ import "embed"
 //go:embed folder/*.sql
 var embedMigrations embed.FS
 
-NewServiceWithEnvironment().InitDB(&embedMigrations).Run()
+func main(){
+	_ := NewServiceWithEnvironment().
+		InitDB(&embedMigrations).
+		Run()
+}
+----
+
+alternative:
+[source,go]
+----
+import "embed"
+
+//go:embed folder/*.sql
+var embedMigrations embed.FS
+
+func main(){
+	srv := NewServiceWithEnvironment()
+	gormDB := srv.GetGormWithEmbeddedMigrations(&embedMigrations)
+
+	srv.Run()
+}
+----
+
+
+.Specifying custom metrics for Prometheus for gRPC server
+[source,go]
+----
+import grpcPrometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
+
+func main() {
+	_ := NewServiceWithEnvironment().
+		InitGrpcServerMetrics(grpcPrometheus.WithServerHandlingTimeHistogram()).
+		Run()
+}
 ----

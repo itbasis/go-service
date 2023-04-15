@@ -7,23 +7,23 @@ require (
 	github.com/caarlos0/env/v7 v7.1.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-co-op/gocron v1.19.0
+	github.com/go-co-op/gocron v1.22.0
 	github.com/gofrs/uuid/v5 v5.0.0
+	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/itbasis/go-core-utils v0.0.0-20230408191118-c3206f18cee2
-	github.com/itbasis/go-jwt-auth v0.0.0-20230408192509-10070ee156e9
-	github.com/itbasis/go-log-utils v0.0.0-20230408190913-f18e871ad0cb
-	github.com/itbasis/go-test-utils v0.0.0-20230408190343-e6e89eabc915
+	github.com/itbasis/go-core-utils v0.0.0-20230411120836-a403cfcdae25
+	github.com/itbasis/go-jwt-auth v0.0.0-20230411121253-4c0d48e8d32b
+	github.com/itbasis/go-log-utils v0.0.0-20230411121150-569a5b43365d
+	github.com/itbasis/go-test-utils v0.0.0-20230411121231-9c23bde5e4cc
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.6
 	github.com/pressly/goose/v3 v3.10.0
-	github.com/prometheus/client_golang v1.14.0
-	github.com/rs/zerolog v1.29.0
+	github.com/prometheus/client_golang v1.15.0
+	github.com/rs/zerolog v1.29.1
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/driver/postgres v1.5.0
-	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11
+	gorm.io/gorm v1.25.0
 )
 
 require (
@@ -44,7 +44,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20230406165453-00490a63f317 // indirect
-	github.com/itbasis/go-docker-utils v0.0.0-20230408191235-85fbe0b1e5a0 // indirect
+	github.com/itbasis/go-docker-utils v0.0.0-20230411121120-301f087fcfa7 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.3.1 // indirect
@@ -66,6 +66,7 @@ require (
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
+	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -76,6 +77,6 @@ require (
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.8.0 // indirect
-	google.golang.org/genproto v0.0.0-20230403163135-c38d8f061ccd // indirect
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

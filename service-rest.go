@@ -19,12 +19,6 @@ type RestController struct {
 }
 
 func (receiver *Service) GetGin() *gin.Engine {
-	if receiver.config.RestServerDisabled {
-		log.Error().Msg(gRPCServerIsDisabled)
-
-		return nil
-	}
-
 	if receiver.gin == nil {
 		receiver.initGinServer()
 	}
@@ -33,10 +27,20 @@ func (receiver *Service) GetGin() *gin.Engine {
 }
 
 func (receiver *Service) AddRestControllers(restControllers ...RestController) {
-	log.Trace().Msgf("REST controllers for adding: %v", restControllers)
+	log.Debug().Msgf("REST controllers for adding: %v", restControllers)
 
 	receiver.ginControllers = append(receiver.ginControllers, restControllers...)
-	log.Trace().Msgf("REST controllers: %v", receiver.ginControllers)
+	log.Debug().Msgf("REST controllers: %v", receiver.ginControllers)
+
+	log.Trace().Msgf("gin: %v", receiver.gin)
+
+	if receiver.gin != nil {
+		for _, restController := range restControllers {
+			log.Debug().Msgf("adding REST controller: %v", restController)
+
+			receiver.gin.Handle(restController.Method, restController.Path, restController.Handler)
+		}
+	}
 }
 
 func (receiver *Service) initGinServer() {
@@ -50,6 +54,8 @@ func (receiver *Service) initGinServer() {
 	log.Debug().Msgf("REST controllers: %v", receiver.ginControllers)
 
 	for _, restController := range receiver.ginControllers {
+		log.Debug().Msgf("adding REST controller: %v", restController)
+
 		receiver.gin.Handle(restController.Method, restController.Path, restController.Handler)
 	}
 }

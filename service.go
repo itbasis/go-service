@@ -4,14 +4,13 @@ import (
 	"sync"
 
 	"github.com/benbjohnson/clock"
+	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
+	"github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	coreUtils "github.com/itbasis/go-core-utils"
 	jwtToken "github.com/itbasis/go-jwt-auth/jwt-token"
 	logUtils "github.com/itbasis/go-log-utils"
 	"github.com/itbasis/go-service/db"
-	"github.com/itbasis/go-service/utils/time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
@@ -21,7 +20,8 @@ type Service struct {
 
 	jwtToken jwtToken.JwtToken
 
-	grpc                   *grpc.Server
+	grpcServer             *grpc.Server
+	grpcServerMetrics      *prometheus.ServerMetrics
 	GrpcClientInterceptors []grpc.DialOption
 
 	gin            *gin.Engine
@@ -55,19 +55,11 @@ func NewServiceWithConfig(config *Config) *Service {
 	service.clock = clock.New()
 	service.initJwtToken()
 
-	if service.config.SchedulerEnabled {
-		service.scheduler = gocron.NewScheduler(time.GlobalTime)
-	}
-
 	return service
 }
 
 func (receiver *Service) Run() {
 	log.Debug().Msg("running service...")
-
-	if receiver.gorm == nil {
-		receiver.InitDB(nil)
-	}
 
 	if receiver.config.SchedulerEnabled {
 		receiver.scheduler.StartAsync()
@@ -75,13 +67,7 @@ func (receiver *Service) Run() {
 
 	wg := &sync.WaitGroup{}
 
-	if receiver.config.RestServerDisabled {
-		log.Info().Msg(httpServerIsDisabled)
-	} else {
-		wg.Add(1)
-		go receiver.runGinServer(wg)
-	}
-
+	// gRPC
 	if receiver.config.GrpcServerDisabled {
 		log.Info().Msg(gRPCServerIsDisabled)
 	} else {
@@ -89,18 +75,16 @@ func (receiver *Service) Run() {
 		go receiver.runGrpcServer(wg)
 	}
 
+	// HTTP
+	wg.Add(1)
+
+	go receiver.runGinServer(wg)
+
 	wg.Wait()
 }
 
 func (receiver *Service) GetConfig() Config {
 	return *receiver.config
-}
-
-func (receiver *Service) GetScheduler() *gocron.Scheduler {
-	if receiver.scheduler == nil {
-		log.Warn().Msg("scheduler is not enabled")
-	}
-	return receiver.scheduler
 }
 
 func (receiver *Service) GetClock() clock.Clock {

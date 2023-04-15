@@ -53,7 +53,7 @@ func (receiver *AbstractScheduler) GetLogger() zerolog.Logger {
 }
 
 func (receiver *AbstractScheduler) Schedule(scheduler *gocron.Scheduler) {
-	// TODO: Добавить prometheus https://github.com/go-co-op/gocron/issues/317
+	// issue: Add prometheus metrics https://github.com/go-co-op/gocron/issues/317
 
 	if _, err := receiver.funcCustomizeSchedule(scheduler).Do(receiver.funcJob); err != nil {
 		receiver.logger.Error().Err(err).Msg("Failed to start job")

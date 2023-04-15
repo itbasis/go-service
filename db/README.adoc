@@ -8,10 +8,10 @@
 
 |`DB_DIALECT`
 |no
-|postgres
+|pgx
 
 |`DB_HOST`
-|yes
+|*yes*
 |
 
 |`DB_PORT`
@@ -19,7 +19,7 @@
 |5432
 
 |`DB_NAME`
-|yes
+|*yes*
 |
 
 |`DB_SSL_MODE`
@@ -43,7 +43,7 @@
 |
 
 |`DB_PASSWORD`
-|yes
+|*yes*
 |
 
 |`SCHEMA_DB_USER`
@@ -60,7 +60,7 @@
 |===
 
 == Конвенция работы с БД из сервисов
-. Для сущностей рекомендуется использование метода link:https://gorm.io/docs/conventions.html#TableName[`TableName`] и расширение от link:base-entity.go[BaseEntity]
+. For entities, it is recommended to use the method link:https://gorm.io/docs/conventions.html#TableName[`TableName`] and extend from link:base-entity.go[BaseEntity]
 +
 [sourse,go]
 ====
@@ -73,35 +73,6 @@ func (MyEntity) TableName() string {
 }
 ====
 
-== Создание БД для сервиса
-. Создаём БД
-+
-[source,postgresql]
-====
-CREATE DATABASE "DB_NAME";
-====
-+
-. Добавляем extensions в созданную БД
-+
-[source,postgresql]
-====
-CREATE EXTENSION "uuid-ossp";
+include::naming-policy.adoc[]
 
-CREATE EXTENSION "pgcrypto";
-
-CREATE EXTENSION "citext";
-====
-
-== Политика наименований
-
-. в именах таблиц и полей в качестве разделителя используем подчёркивание
-. Индексы пишем с разделителем через дефис. `table_name-field_name-key`, где `key` - суффикс имени индекса
-. Primary Key индексы имеют суффикс `pkey`
-. Уникальные индексы имеют суффикс `udx`
-. Ссылочные индексы имеют суффикс `fk`
-. Все остальные индексы имеют суффикс `idx`
-. Для сумм используем тип `decimal` с указанием размерности и точности
-
-== TODO
-. See https://github.com/Ahmet-Kaplan/gorm-zerolog
-. Для Goose включить поддержку zerolog
+include::TODO.adoc[]

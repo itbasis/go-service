@@ -18,7 +18,7 @@ import (
 )
 
 type DB struct {
-	Gorm *gorm.DB
+	gorm *gorm.DB
 
 	dbEmbedMigrations *embed.FS
 
@@ -58,6 +58,8 @@ func NewDB(dbEmbedMigrations *embed.FS) (*DB, error) {
 
 	return instance, nil
 }
+
+func (receiver *DB) GetGorm() *gorm.DB { return receiver.gorm }
 
 func (receiver *DB) readEnvironmentConfig() error {
 	log.Info().Msg("reading environment...")
@@ -157,7 +159,7 @@ func (receiver *DB) connectDB() error {
 
 	log.Info().Msgf("Database version: %s", version)
 
-	receiver.Gorm = gormDB
+	receiver.gorm = gormDB
 
 	return nil
 }

@@ -7,9 +7,8 @@ type Config struct {
 
 	SchedulerEnabled bool `env:"SCHEDULER_ENABLED"`
 
-	RestServerDisabled bool   `env:"REST_SERVER_DISABLED" envDefault:"true"`
-	RestServerHost     string `env:"REST_SERVER_HOST" envDefault:"0.0.0.0"`
-	RestServerPort     int    `env:"REST_SERVER_PORT" envDefault:"8080"`
+	RestServerHost string `env:"REST_SERVER_HOST" envDefault:"0.0.0.0"`
+	RestServerPort int    `env:"REST_SERVER_PORT" envDefault:"8080"`
 
 	GrpcServerDisabled    bool   `env:"GRPC_SERVER_DISABLED"`
 	GrpcServerHost        string `env:"GRPC_SERVER_HOST" envDefault:"0.0.0.0"`

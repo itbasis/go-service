@@ -1,0 +1,12 @@
+== Naming policy
+
+
+. Use underscore as separator in table and field names
+
+. Indexes are written with a separator through a hyphen. `table_name-field_name-key`, where `key` - index name suffix
+.. Primary Key indexes have a `pkey` suffix
+.. Unique indexes have a `udx` suffix
+.. Reference indexes are suffixed with `fk`
+.. All other indexes have the `idx` suffix
+
+. For financial values, we use the `decimal` type with an indication of the dimension and precision

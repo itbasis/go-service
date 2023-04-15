@@ -1,0 +1,4 @@
+== TODO
+
+. See https://github.com/Ahmet-Kaplan/gorm-zerolog
+. For Goose enable zerolog support

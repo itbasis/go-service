@@ -6,38 +6,66 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/gin-gonic/gin"
 	// grpcZerolog "github.com/grpc-ecosystem/go-grpc-middleware/providers/zerolog/v2"
+	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/itbasis/go-jwt-auth/grpc/client"
 	"github.com/itbasis/go-jwt-auth/grpc/server"
 	grpcLogUtils "github.com/itbasis/go-log-utils/grpc"
 	itbasisServiceGrpc "github.com/itbasis/go-service/grpc"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-func (receiver *Service) GetGrpc() *grpc.Server {
+// Deprecated: use GetGrpcServer
+func (receiver *Service) GetGrpc() *grpc.Server { return receiver.GetGrpcServer() }
+
+func (receiver *Service) GetGrpcServer() *grpc.Server {
+	if receiver.grpcServer != nil {
+		return receiver.grpcServer
+	}
+
 	if receiver.config.GrpcServerDisabled {
 		log.Error().Msg(gRPCServerIsDisabled)
 
 		return nil
 	}
 
-	if receiver.grpc == nil {
+	if receiver.grpcServer == nil {
 		receiver.initGrpcServer()
 	}
 
-	return receiver.grpc
+	return receiver.grpcServer
+}
+
+func (receiver *Service) GetGrpcServerMetrics() *grpcPrometheus.ServerMetrics {
+	if receiver.grpcServerMetrics != nil {
+		return receiver.grpcServerMetrics
+	}
+
+	if receiver.config.GrpcServerDisabled {
+		log.Error().Msg(gRPCServerIsDisabled)
+
+		return nil
+	}
+
+	if receiver.grpcServerMetrics == nil {
+		receiver.InitGrpcServerMetrics(nil, nil)
+	}
+
+	return receiver.grpcServerMetrics
 }
 
 func (receiver *Service) initGrpcServer() {
 	authFunc := server.NewAuthServerInterceptorWithCustomParser(receiver.jwtToken).GetAuthFunc()
 
 	interceptorLogger := itbasisServiceGrpc.InterceptorLogger(log.Logger)
+
 	var logOpts []logging.Option
 
 	if log.Logger.Debug().Enabled() {
@@ -48,21 +76,61 @@ func (receiver *Service) initGrpcServer() {
 
 	unaryInterceptors := grpc.ChainUnaryInterceptor(
 		logging.UnaryServerInterceptor(interceptorLogger, logOpts...),
-		grpcPrometheus.UnaryServerInterceptor,
 		grpcLogUtils.GrpcLogUnaryServerInterceptor(),
 		auth.UnaryServerInterceptor(authFunc),
 	)
 	streamInterceptors := grpc.ChainStreamInterceptor(
 		logging.StreamServerInterceptor(interceptorLogger, logOpts...),
-		grpcPrometheus.StreamServerInterceptor,
 		auth.StreamServerInterceptor(authFunc),
 	)
 
-	receiver.grpc = grpc.NewServer(unaryInterceptors, streamInterceptors)
+	receiver.grpcServer = grpc.NewServer(unaryInterceptors, streamInterceptors)
 
 	if receiver.config.GrpcReflectionEnabled {
-		reflection.Register(receiver.grpc)
+		reflection.Register(receiver.grpcServer)
 	}
+}
+
+func (receiver *Service) InitGrpcServerMetrics(
+	serverMetricsOptions []grpcPrometheus.ServerMetricsOption,
+	promHTTPHandlerOpts *promhttp.HandlerOpts,
+) *Service {
+	if len(serverMetricsOptions) == 0 {
+		log.Debug().Msg("Using default server metrics...")
+
+		serverMetricsOptions = []grpcPrometheus.ServerMetricsOption{
+			grpcPrometheus.WithServerHandlingTimeHistogram(),
+		}
+	}
+
+	if promHTTPHandlerOpts == nil {
+		log.Debug().Msg("Using default server metric handlers...")
+
+		promHTTPHandlerOpts = &promhttp.HandlerOpts{
+			EnableOpenMetrics: true,
+		}
+	}
+
+	log.Debug().Msgf("gRPC server metrics count: %d", len(serverMetricsOptions))
+
+	serverMetrics := grpcPrometheus.NewServerMetrics(serverMetricsOptions...)
+	registry := prometheus.NewPedanticRegistry()
+
+	if err := registry.Register(serverMetrics); err != nil {
+		log.Panic().Err(err).Msg("")
+	}
+
+	receiver.AddRestControllers(
+		RestController{
+			Method:  http.MethodGet,
+			Path:    "/metrics/grpc",
+			Handler: gin.WrapH(promhttp.HandlerFor(registry, *promHTTPHandlerOpts)),
+		},
+	)
+
+	receiver.grpcServerMetrics = serverMetrics
+
+	return receiver
 }
 
 func (receiver *Service) GetGrpcClientInterceptors(authClientInterceptor *client.AuthClientInterceptor) {
@@ -89,10 +157,11 @@ func (receiver *Service) GetGrpcClientInterceptors(authClientInterceptor *client
 }
 
 func (receiver *Service) runGrpcServer(wg *sync.WaitGroup) {
-	grpcServer := receiver.GetGrpc()
+	grpcServer := receiver.GetGrpcServer()
 
-	grpcPrometheus.Register(grpcServer)
-	http.Handle("/metrics", promhttp.Handler())
+	if grpcServerMetrics := receiver.GetGrpcServerMetrics(); grpcServerMetrics != nil {
+		grpcServerMetrics.InitializeMetrics(grpcServer)
+	}
 
 	if log.Debug().Enabled() {
 		for service, info := range grpcServer.GetServiceInfo() {
