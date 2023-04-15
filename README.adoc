@@ -5,8 +5,7 @@ Possibilities:
 // suppress inspection "AsciiDocLinkResolve"
 . Running a link:https://gin-gonic.com/[gin] based HTTP/REST server ( see link:config.go#L10[config] )
 // suppress inspection "AsciiDocLinkResolve"
-. Running a gRPC server with metrics for Prometheus (see link:config.go#L14[config] and link:https://github
-.com/grpc-ecosystem/go-grpc-middleware/blob/main/providers/prometheus/options.go[options])
+. Running a gRPC server with metrics for Prometheus (see link:config.go#L14[config] and link:https://github.com/grpc-ecosystem/go-grpc-middleware/blob/main/providers/prometheus/options.go[options])
 . Working with the database via link:https://gorm.io/[GORM] with support for database migration via link:https://pressly.github.io/goose/[Goose] with the ability to specify migration files from the file system or via `embed.FS`
 . Using the link:https://github.com/go-co-op/gocron[gocron] task scheduler
 . Different log output format based on link:https://github.com/rs/zerolog[Zerolog], depending on the launch environment - launch in container or not
