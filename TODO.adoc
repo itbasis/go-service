@@ -5,7 +5,3 @@ include::db/TODO.adoc[lines=2..]
 
 == Scheduler
 include::scheduler/TODO.adoc[lines=2..]
-
-== Deprecated
-
-* [ ] grpc_zerolog

@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 
-	// "github.com/pereslava/grpc_zerolog/ctxzerolog"
 	"github.com/rs/zerolog/log"
 )
 

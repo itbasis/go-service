@@ -7,14 +7,14 @@ require (
 	github.com/caarlos0/env/v7 v7.1.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-co-op/gocron v1.22.0
+	github.com/go-co-op/gocron v1.22.2
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
-	github.com/itbasis/go-core-utils v0.0.0-20230411120836-a403cfcdae25
-	github.com/itbasis/go-jwt-auth v0.0.0-20230411121253-4c0d48e8d32b
-	github.com/itbasis/go-log-utils v0.0.0-20230411121150-569a5b43365d
-	github.com/itbasis/go-test-utils v0.0.0-20230411121231-9c23bde5e4cc
+	github.com/itbasis/go-core-utils v0.0.1
+	github.com/itbasis/go-jwt-auth v0.0.2
+	github.com/itbasis/go-log-utils v0.0.1
+	github.com/itbasis/go-test-utils v0.0.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.6
 	github.com/pressly/goose/v3 v3.10.0
@@ -40,11 +40,11 @@ require (
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0-rc.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20230406165453-00490a63f317 // indirect
-	github.com/itbasis/go-docker-utils v0.0.0-20230411121120-301f087fcfa7 // indirect
+	github.com/itbasis/go-docker-utils v0.0.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.3.1 // indirect
@@ -59,14 +59,12 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
-	github.com/pereslava/grpc_zerolog v0.0.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
