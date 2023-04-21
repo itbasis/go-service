@@ -70,8 +70,8 @@ github.com/itbasis/go-core-utils v0.0.1 h1:yMlNMXzYSYqWbjyMFA72vCzIGtq7BjDMhH8L0
 github.com/itbasis/go-core-utils v0.0.1/go.mod h1:ciXmicBoQTKm8zoNzKFiwWL93u5bQfgc2dUO6Ao4Qqk=
 github.com/itbasis/go-docker-utils v0.0.1 h1:UW+AG2qMaGn+nHM6FT1ATI0h0xbxWRgJnMIgXgWY5ds=
 github.com/itbasis/go-docker-utils v0.0.1/go.mod h1:Hbb3VP4zBd+qPpSCcgXOAHMEjbu7zmiwK2YY5X9oumU=
-github.com/itbasis/go-jwt-auth v0.0.2 h1:ys+SZGgMfrhnyw+1JugQll3qO9Zl+d2snHmIxv2OxVA=
-github.com/itbasis/go-jwt-auth v0.0.2/go.mod h1:MEXRFwUOjWZXv0WpiyDMliWBFOHSaLj+JlAmom2DeQE=
+github.com/itbasis/go-jwt-auth v0.0.3 h1:WThuiegB0AkCWsZlHH52LVnIIt3s4Ym3pAcDDbgUxkI=
+github.com/itbasis/go-jwt-auth v0.0.3/go.mod h1:t8r0/bFrdBELU371zgd71I96qv4xLyYydc1C2gN0ZQg=
 github.com/itbasis/go-log-utils v0.0.1 h1:GgloG1AK4vopEpJ0EimygshF4A+tttSXFhexGQpSQQc=
 github.com/itbasis/go-log-utils v0.0.1/go.mod h1:gS2CbghtDnWzxQM7aZhEYuSDDIjOVfEaqUS7ZTwUCgU=
 github.com/itbasis/go-test-utils v0.0.1 h1:95F0b4yLM6FKAu8i942r0kSi1/p7LKWHBVavaR/OGaM=
