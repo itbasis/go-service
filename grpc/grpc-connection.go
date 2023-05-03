@@ -27,7 +27,7 @@ func GetServiceConnection(logger zerolog.Logger, serviceHost string, useSSL bool
 		opts...,
 	)
 	if nil != err {
-		logger.Panic().Err(err).Msg("")
+		logger.Panic().Err(err).Send()
 	}
 
 	logger.Info().Msgf("connection state for host '%s': %s", serviceHost, conn.GetState())

@@ -31,14 +31,14 @@ func String2TimeWithCustomLayout(ctx context.Context, value *string, layout stri
 
 	if value == nil {
 		errParsing := fmt.Errorf("%w: '%v'", ErrParsingTime, value)
-		logger.Error().Err(errParsing).Msg("")
+		logger.Error().Err(errParsing).Send()
 
 		return nil, errParsing
 	}
 
 	if *value == "" {
 		errParsing := fmt.Errorf("%w: ''", ErrParsingTime)
-		logger.Error().Err(errParsing).Msg("")
+		logger.Error().Err(errParsing).Send()
 
 		return nil, errParsing
 	}

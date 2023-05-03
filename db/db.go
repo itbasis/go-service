@@ -134,14 +134,14 @@ func (receiver *DB) connectDB() error {
 		},
 	)
 	if err != nil {
-		log.Error().Err(err).Msg("")
+		log.Error().Err(err).Send()
 
 		return ErrConnectDB
 	}
 
 	db, err := gormDB.DB()
 	if err != nil {
-		log.Error().Err(err).Msg("")
+		log.Error().Err(err).Send()
 
 		return ErrConnectDB
 	}
@@ -152,7 +152,7 @@ func (receiver *DB) connectDB() error {
 
 	var version string
 	if res := gormDB.Raw("SELECT VERSION();").First(&version); res.Error != nil {
-		log.Error().Err(res.Error).Msg("")
+		log.Error().Err(res.Error).Send()
 
 		return ErrConnectDB
 	}
@@ -193,7 +193,7 @@ func (receiver *DB) migrationDB() error {
 	}()
 
 	if err = goose.Up(sqlDb, migrationDir, goose.WithAllowMissing()); err != nil {
-		log.Error().Err(err).Msg("")
+		log.Error().Err(err).Send()
 
 		return ErrDbMigration
 	}

@@ -17,7 +17,7 @@ func (receiver *Service) InitDB(dbEmbedMigrations *embed.FS) *Service {
 
 	newDB, err := db.NewDB(dbEmbedMigrations)
 	if err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	receiver.gorm = newDB

@@ -37,7 +37,7 @@ func NewServiceWithEnvironment() *Service {
 
 	config := &Config{}
 	if err := coreUtils.ReadEnvConfig(config); err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	return NewServiceWithConfig(config)
@@ -48,7 +48,7 @@ func NewServiceWithConfig(config *Config) *Service {
 
 	_, err := logUtils.ConfigureRootLogger(config.ServiceName)
 	if err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	service := &Service{config: config}

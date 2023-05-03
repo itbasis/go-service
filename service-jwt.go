@@ -9,7 +9,7 @@ import (
 func (receiver *Service) initJwtToken() {
 	jt, err := jwtAuthTokenImpl.NewJwtToken(receiver.clock)
 	if err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	receiver.jwtToken = jt

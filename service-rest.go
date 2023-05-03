@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"sync"
 
-	ginzerolog "github.com/dn365/gin-zerolog"
+	ginZerolog "github.com/dn365/gin-zerolog"
 	"github.com/gin-gonic/gin"
+	"github.com/itbasis/go-service/rest"
 	"github.com/rs/zerolog"
 
 	"github.com/rs/zerolog/log"
@@ -46,9 +47,15 @@ func (receiver *Service) initGinServer() {
 	receiver.gin = gin.New()
 	receiver.gin.Use(
 		gin.Recovery(),
+		ginZerolog.Logger("rest"),
 		receiver.ginLoggerCtx,
-		ginzerolog.Logger("rest"),
 	)
+
+	if log.Trace().Enabled() {
+		log.Info().Msg("enable REST request tracing")
+
+		receiver.gin.Use(rest.LoggingRequest)
+	}
 
 	log.Debug().Msgf("REST controllers: %v", receiver.ginControllers)
 
@@ -78,7 +85,7 @@ func (receiver *Service) runGinServer(wg *sync.WaitGroup) {
 	log.Trace().Msgf("rest listen address: %s", listen)
 
 	if err := engine.Run(listen); err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	wg.Done()

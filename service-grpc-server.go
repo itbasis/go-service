@@ -117,7 +117,7 @@ func (receiver *Service) InitGrpcServerMetrics(
 	registry := prometheus.NewPedanticRegistry()
 
 	if err := registry.Register(serverMetrics); err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	receiver.AddRestControllers(
@@ -171,13 +171,13 @@ func (receiver *Service) runGrpcServer(wg *sync.WaitGroup) {
 
 	listen, err := net.Listen("tcp4", fmt.Sprintf("%s:%d", receiver.config.GrpcServerHost, receiver.config.GrpcServerPort))
 	if err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	log.Info().Msgf("gRPC listen: %s", listen.Addr().String())
 
 	if err = grpcServer.Serve(listen); err != nil {
-		log.Panic().Err(err).Msg("")
+		log.Panic().Err(err).Send()
 	}
 
 	wg.Done()
