@@ -18,7 +18,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.9.4
 	github.com/onsi/gomega v1.27.6
 	github.com/pressly/goose/v3 v3.10.0
-	github.com/prometheus/client_golang v1.15.0
+	github.com/prometheus/client_golang v1.15.1
 	github.com/rs/zerolog v1.29.1
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
