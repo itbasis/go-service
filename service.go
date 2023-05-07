@@ -36,7 +36,7 @@ func NewServiceWithEnvironment() *Service {
 	logUtils.ConfigureDefaultContextLogger(false)
 
 	config := &Config{}
-	if err := coreUtils.ReadEnvConfig(config); err != nil {
+	if err := coreUtils.ReadEnvConfig(config, nil); err != nil {
 		log.Panic().Err(err).Send()
 	}
 

@@ -4,16 +4,16 @@ go 1.20
 
 require (
 	github.com/benbjohnson/clock v1.3.3
-	github.com/caarlos0/env/v7 v7.1.0
+	github.com/caarlos0/env/v8 v8.0.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.25.0
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
-	github.com/itbasis/go-core-utils v0.0.1
-	github.com/itbasis/go-jwt-auth v0.0.7
-	github.com/itbasis/go-log-utils v0.0.2
+	github.com/itbasis/go-core-utils v0.1.0
+	github.com/itbasis/go-jwt-auth v0.0.8
+	github.com/itbasis/go-log-utils v0.0.3
 	github.com/itbasis/go-test-utils v0.0.2
 	github.com/onsi/ginkgo/v2 v2.9.4
 	github.com/onsi/gomega v1.27.6

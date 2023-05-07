@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/caarlos0/env/v7"
+	"github.com/caarlos0/env/v8"
 	coreUtils "github.com/itbasis/go-core-utils"
 	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog/log"
@@ -64,13 +64,13 @@ func (receiver *DB) GetGorm() *gorm.DB { return receiver.gorm }
 func (receiver *DB) readEnvironmentConfig() error {
 	log.Info().Msg("reading environment...")
 
-	if err := coreUtils.ReadEnvConfig(receiver.Config); err != nil {
+	if err := coreUtils.ReadEnvConfig(receiver.Config, nil); err != nil {
 		log.Error().Err(err).Msg("error reading configuration from environment")
 
 		return ErrCreateInstance
 	}
 
-	if err := coreUtils.ReadEnvConfig(receiver.connCredential); err != nil {
+	if err := coreUtils.ReadEnvConfig(receiver.connCredential, nil); err != nil {
 		log.Error().Err(err).Msg("error reading credentials from environment")
 
 		return ErrCreateInstance
@@ -82,7 +82,7 @@ func (receiver *DB) readEnvironmentConfig() error {
 		Password: receiver.connCredential.Password,
 	}
 
-	if err := coreUtils.ReadEnvConfig(receiver.connSchemaCredential, env.Options{Prefix: "SCHEMA_"}); err != nil {
+	if err := coreUtils.ReadEnvConfig(receiver.connSchemaCredential, &env.Options{Prefix: "SCHEMA_"}); err != nil {
 		log.Error().Err(err).Msg("error reading credentials for schema from environment")
 
 		return ErrCreateInstance
