@@ -12,11 +12,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type RestController struct {
+type HttpController struct {
 	Method  string
 	Path    string
 	Handler gin.HandlerFunc
 }
+
+// Deprecated: use HttpController
+type RestController = HttpController
 
 func (receiver *Service) GetGin() *gin.Engine {
 	if receiver.gin == nil {
@@ -26,16 +29,21 @@ func (receiver *Service) GetGin() *gin.Engine {
 	return receiver.gin
 }
 
+// Deprecated: use AddHttpControllers
 func (receiver *Service) AddRestControllers(restControllers ...RestController) {
-	log.Debug().Msgf("REST controllers for adding: %v", restControllers)
+	receiver.AddHttpControllers(restControllers...)
+}
 
-	receiver.ginControllers = append(receiver.ginControllers, restControllers...)
+func (receiver *Service) AddHttpControllers(httpControllers ...HttpController) {
+	log.Debug().Msgf("REST controllers for adding: %v", httpControllers)
+
+	receiver.ginControllers = append(receiver.ginControllers, httpControllers...)
 	log.Debug().Msgf("REST controllers: %v", receiver.ginControllers)
 
 	log.Trace().Msgf("gin: %v", receiver.gin)
 
 	if receiver.gin != nil {
-		for _, restController := range restControllers {
+		for _, restController := range httpControllers {
 			log.Debug().Msgf("adding REST controller: %v", restController)
 
 			receiver.gin.Handle(restController.Method, restController.Path, restController.Handler)
