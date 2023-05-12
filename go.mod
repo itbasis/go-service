@@ -7,7 +7,7 @@ require (
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-co-op/gocron v1.25.0
+	github.com/go-co-op/gocron v1.27.0
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
@@ -68,6 +68,7 @@ require (
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
