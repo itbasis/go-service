@@ -15,7 +15,7 @@ require (
 	github.com/itbasis/go-jwt-auth v0.0.10
 	github.com/itbasis/go-log-utils v0.0.4
 	github.com/itbasis/go-test-utils v0.0.3
-	github.com/onsi/ginkgo/v2 v2.9.4
+	github.com/onsi/ginkgo/v2 v2.9.5
 	github.com/onsi/gomega v1.27.6
 	github.com/pressly/goose/v3 v3.11.2
 	github.com/prometheus/client_golang v1.15.1
