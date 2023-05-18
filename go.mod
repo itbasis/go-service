@@ -3,7 +3,7 @@ module github.com/itbasis/go-service
 go 1.20
 
 require (
-	github.com/benbjohnson/clock v1.3.4
+	github.com/benbjohnson/clock v1.3.5
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
 	github.com/gin-gonic/gin v1.9.0
