@@ -6,7 +6,7 @@ require (
 	github.com/benbjohnson/clock v1.3.5
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/dn365/gin-zerolog v0.0.0-20171227063204-b43714b00db1
-	github.com/gin-gonic/gin v1.9.0
+	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.28.0
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0
@@ -29,7 +29,7 @@ require (
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.8.10 // indirect
+	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
