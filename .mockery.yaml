@@ -1,0 +1,5 @@
+with-expecter: True
+packages:
+  github.com/itbasis/go-service/v2:
+    config:
+      all: True

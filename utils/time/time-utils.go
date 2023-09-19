@@ -2,14 +2,12 @@ package time
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
-	"github.com/rs/zerolog"
+	"github.com/juju/zaputil/zapctx"
+	"github.com/pkg/errors"
 )
-
-var ErrParsingTime = errors.New("error parsing string to Time")
 
 // TODO Добавить таймзону в тесты и парсинг
 const timeLayout = time.RFC3339
@@ -26,19 +24,19 @@ func String2Time(ctx context.Context, value *string) (*time.Time, error) {
 }
 
 func String2TimeWithCustomLayout(ctx context.Context, value *string, layout string) (*time.Time, error) {
-	logger := zerolog.Ctx(ctx)
-	logger.Debug().Msgf("value: %v", value)
+	logger := zapctx.Logger(ctx).Sugar()
+	logger.Debugf("value: %v", value)
 
 	if value == nil {
 		errParsing := fmt.Errorf("%w: '%v'", ErrParsingTime, value)
-		logger.Error().Err(errParsing).Send()
+		logger.Error(errParsing)
 
 		return nil, errParsing
 	}
 
 	if *value == "" {
 		errParsing := fmt.Errorf("%w: ''", ErrParsingTime)
-		logger.Error().Err(errParsing).Send()
+		logger.Error(errParsing)
 
 		return nil, errParsing
 	}
@@ -46,7 +44,7 @@ func String2TimeWithCustomLayout(ctx context.Context, value *string, layout stri
 	result, err := time.ParseInLocation(layout, *value, GlobalTime)
 	if err != nil {
 		errParsing := fmt.Errorf("%w: '%s'", ErrParsingTime, *value)
-		logger.Error().Err(err).Msg(errParsing.Error())
+		logger.Error(errors.Wrap(err, errParsing.Error()))
 
 		return nil, errParsing
 	}

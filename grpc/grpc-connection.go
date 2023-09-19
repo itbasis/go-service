@@ -1,20 +1,23 @@
 package grpc
 
 import (
+	"context"
 	"crypto/tls"
 
-	"github.com/rs/zerolog"
+	"github.com/juju/zaputil/zapctx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func GetServiceConnection(logger zerolog.Logger, serviceHost string, useSSL bool, opts ...grpc.DialOption) *grpc.ClientConn {
-	logger.Debug().Msgf("getting service connection for host: %s", serviceHost)
+func GetServiceConnection(ctx context.Context, serviceHost string, useSSL bool, opts ...grpc.DialOption) *grpc.ClientConn {
+	logger := zapctx.Logger(ctx).Sugar()
+
+	logger.Debugf("getting service connection for host: %s", serviceHost)
 
 	if useSSL {
 		// FIXME Add SSL connection method with certificate verification
-		logger.Warn().Msgf("The connection will be with an insecure SSL connection (InsecureSkipVerify=true) for the host: %s", serviceHost)
+		logger.Warnf("The connection will be with an insecure SSL connection (InsecureSkipVerify=true) for the host: %s", serviceHost)
 
 		// #nosec
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true}))) //nolint:gosec
@@ -27,10 +30,10 @@ func GetServiceConnection(logger zerolog.Logger, serviceHost string, useSSL bool
 		opts...,
 	)
 	if nil != err {
-		logger.Panic().Err(err).Send()
+		logger.Panic(err)
 	}
 
-	logger.Info().Msgf("connection state for host '%s': %s", serviceHost, conn.GetState())
+	logger.Infof("connection state for host '%s': %s", serviceHost, conn.GetState())
 
 	return conn
 }

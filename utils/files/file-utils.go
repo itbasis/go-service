@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/rs/zerolog"
+	"github.com/juju/zaputil/zapctx"
 )
 
 const defaultBufferSize = 64 * 1024 // 64Kb
 
 func Sha256Hash(ctx context.Context, reader io.Reader) (uint64, string, error) {
-	logger := zerolog.Ctx(ctx)
+	logger := zapctx.Logger(ctx).Sugar()
 	bfr := bufio.NewReader(reader)
 
 	hash := sha256.New()
@@ -23,10 +23,11 @@ func Sha256Hash(ctx context.Context, reader io.Reader) (uint64, string, error) {
 	totalSize := 0
 
 	for {
+		//nolint:varnamelen
 		n, err := bfr.Read(buf)
 
 		if err == nil {
-			logger.Debug().Msgf("read bytes: %d", n)
+			logger.Debugf("read bytes: %d", n)
 
 			totalSize += n
 			hash.Write(buf[:n])
@@ -37,12 +38,13 @@ func Sha256Hash(ctx context.Context, reader io.Reader) (uint64, string, error) {
 		if errors.Is(err, io.EOF) {
 			s := fmt.Sprintf("%x", hash.Sum(nil))
 
-			logger.Debug().Msgf("reading %d bytes. sha256: %s", totalSize, s)
+			logger.Debugf("reading %d bytes. sha256: %s", totalSize, s)
 
 			return uint64(totalSize), s, nil
 		}
 
-		logger.Error().Err(err).Msgf("Buffer read error for SHA256 calculation")
+		err = fmt.Errorf("buffer read error for SHA256 calculation: %w", err)
+		logger.Error(err)
 
 		return 0, "", err
 	}

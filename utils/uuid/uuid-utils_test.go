@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid/v5"
-	itbasisServiceUtilsUUID "github.com/itbasis/go-service/utils/uuid"
+	itbasisServiceUtilsUUID "github.com/itbasis/go-service/v2/utils/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

@@ -1,10 +1,12 @@
 package scheduler
 
 import (
+	"fmt"
+
 	"github.com/go-co-op/gocron"
-	logUtils "github.com/itbasis/go-log-utils"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	logUtils "github.com/itbasis/go-log-utils/v2"
+	"github.com/juju/zaputil/zapctx"
+	"go.uber.org/zap"
 )
 
 type FuncJob = func()
@@ -18,7 +20,7 @@ type Service interface {
 type AbstractScheduler struct {
 	Service
 
-	logger zerolog.Logger
+	logger *zap.SugaredLogger
 
 	funcJob               func()
 	funcCustomizeSchedule FuncCustomizeSchedule
@@ -33,7 +35,8 @@ func NewAbstractSchedulerWithCustomizeSchedule(
 	funcJob func(),
 	funcCustomizeSchedule *FuncCustomizeSchedule,
 ) *AbstractScheduler {
-	logger := log.Logger.With().Str(logUtils.MdcSchedulerName, schedulerName).Logger()
+	logger := zapctx.Default.With(zap.String(logUtils.MdcSchedulerName, schedulerName)).Sugar()
+
 	abstractScheduler := AbstractScheduler{
 		logger:  logger,
 		funcJob: funcJob,
@@ -48,20 +51,21 @@ func NewAbstractSchedulerWithCustomizeSchedule(
 	return &abstractScheduler
 }
 
-func (receiver *AbstractScheduler) GetLogger() zerolog.Logger {
+func (receiver *AbstractScheduler) GetLogger() *zap.SugaredLogger {
 	return receiver.logger
 }
 
+// Schedule
+//
+// issue: Add prometheus metrics https://github.com/go-co-op/gocron/issues/317
 func (receiver *AbstractScheduler) Schedule(scheduler *gocron.Scheduler) {
-	// issue: Add prometheus metrics https://github.com/go-co-op/gocron/issues/317
-
 	if _, err := receiver.funcCustomizeSchedule(scheduler).Do(receiver.funcJob); err != nil {
-		receiver.logger.Error().Err(err).Msg("Failed to start job")
+		receiver.logger.Error(fmt.Errorf("failed to start job: %w", err))
 	}
 }
 
 func (receiver *AbstractScheduler) defaultCustomizeSchedule(scheduler *gocron.Scheduler) *gocron.Scheduler {
-	receiver.logger.Warn().Msg("The default settings are used for the scheduler")
+	receiver.logger.Warn("The default settings are used for the scheduler")
 
-	return scheduler.Every(5).Seconds().WaitForSchedule()
+	return scheduler.Every(DefaultEveryInterval).Seconds().WaitForSchedule()
 }

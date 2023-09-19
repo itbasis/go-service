@@ -5,12 +5,13 @@ import (
 	"io"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/juju/zaputil/zapctx"
+	"go.uber.org/zap/zapcore"
 )
 
 func LoggingRequest(ctx *gin.Context) {
-	logger := zerolog.Ctx(ctx)
+	log := zapctx.Logger(ctx)
+	logger := log.Sugar()
 
 	var buf bytes.Buffer
 
@@ -18,7 +19,7 @@ func LoggingRequest(ctx *gin.Context) {
 	body, err := io.ReadAll(tee)
 
 	if err != nil {
-		logger.Error().Err(err).Send()
+		logger.Error(err)
 
 		ctx.Next()
 
@@ -27,9 +28,11 @@ func LoggingRequest(ctx *gin.Context) {
 
 	ctx.Request.Body = io.NopCloser(&buf)
 
-	log.Trace().Msgf("uri: %s", ctx.Request.RequestURI)
-	log.Trace().Msgf("headers: %++v", ctx.Request.Header)
-	log.Trace().Msgf("body: %s", string(body))
+	if log.Core().Enabled(zapcore.DebugLevel) {
+		logger.Debugf("uri: %s", ctx.Request.RequestURI)
+		logger.Debugf("headers: %++v", ctx.Request.Header)
+		logger.Debugf("body: %s", string(body))
+	}
 
 	ctx.Next()
 }

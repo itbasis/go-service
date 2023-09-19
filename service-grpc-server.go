@@ -7,17 +7,18 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	// grpcZerolog "github.com/grpc-ecosystem/go-grpc-middleware/providers/zerolog/v2"
+	"go.uber.org/zap/zapcore"
+
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/itbasis/go-jwt-auth/grpc/client"
-	"github.com/itbasis/go-jwt-auth/grpc/server"
-	grpcLogUtils "github.com/itbasis/go-log-utils/grpc"
-	itbasisServiceGrpc "github.com/itbasis/go-service/grpc"
+	"github.com/itbasis/go-jwt-auth/v2/grpc/client"
+	"github.com/itbasis/go-jwt-auth/v2/grpc/server"
+	grpcLogUtils "github.com/itbasis/go-log-utils/v2/grpc"
+	itbasisServiceGrpc "github.com/itbasis/go-service/v2/grpc"
+	"github.com/juju/zaputil/zapctx"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -31,7 +32,7 @@ func (receiver *Service) GetGrpcServer() *grpc.Server {
 	}
 
 	if receiver.config.GrpcServerDisabled {
-		log.Error().Msg(gRPCServerIsDisabled)
+		zapctx.Default.Sugar().Error(gRPCServerIsDisabled)
 
 		return nil
 	}
@@ -49,7 +50,7 @@ func (receiver *Service) GetGrpcServerMetrics() *grpcPrometheus.ServerMetrics {
 	}
 
 	if receiver.config.GrpcServerDisabled {
-		log.Error().Msg(gRPCServerIsDisabled)
+		zapctx.Default.Sugar().Error(gRPCServerIsDisabled)
 
 		return nil
 	}
@@ -64,11 +65,12 @@ func (receiver *Service) GetGrpcServerMetrics() *grpcPrometheus.ServerMetrics {
 func (receiver *Service) initGrpcServer() {
 	authFunc := server.NewAuthServerInterceptorWithCustomParser(receiver.jwtToken).GetAuthFunc()
 
-	interceptorLogger := itbasisServiceGrpc.InterceptorLogger(log.Logger)
+	logger := zapctx.Default
+	interceptorLogger := itbasisServiceGrpc.InterceptorLogger(logger)
 
 	var logOpts []logging.Option
 
-	if log.Logger.Debug().Enabled() {
+	if logger.Core().Enabled(zapcore.DebugLevel) {
 		logOpts = []logging.Option{
 			logging.WithLogOnEvents(logging.StartCall, logging.FinishCall, logging.PayloadReceived, logging.PayloadSent),
 		}
@@ -95,8 +97,10 @@ func (receiver *Service) InitGrpcServerMetrics(
 	serverMetricsOptions []grpcPrometheus.ServerMetricsOption,
 	promHTTPHandlerOpts *promhttp.HandlerOpts,
 ) *Service {
+	log := zapctx.Default.Sugar()
+
 	if len(serverMetricsOptions) == 0 {
-		log.Debug().Msg("Using default server metrics...")
+		log.Debug("Using default server metrics...")
 
 		serverMetricsOptions = []grpcPrometheus.ServerMetricsOption{
 			grpcPrometheus.WithServerHandlingTimeHistogram(),
@@ -104,24 +108,24 @@ func (receiver *Service) InitGrpcServerMetrics(
 	}
 
 	if promHTTPHandlerOpts == nil {
-		log.Debug().Msg("Using default server metric handlers...")
+		log.Debug("Using default server metric handlers...")
 
 		promHTTPHandlerOpts = &promhttp.HandlerOpts{
 			EnableOpenMetrics: true,
 		}
 	}
 
-	log.Debug().Msgf("gRPC server metrics count: %d", len(serverMetricsOptions))
+	log.Debugf("gRPC server metrics count: %d", len(serverMetricsOptions))
 
 	serverMetrics := grpcPrometheus.NewServerMetrics(serverMetricsOptions...)
 	registry := prometheus.NewPedanticRegistry()
 
 	if err := registry.Register(serverMetrics); err != nil {
-		log.Panic().Err(err).Send()
+		log.Panic(err)
 	}
 
-	receiver.AddRestControllers(
-		RestController{
+	receiver.AddHTTPControllers(
+		HTTPController{
 			Method:  http.MethodGet,
 			Path:    "/metrics/grpc",
 			Handler: gin.WrapH(promhttp.HandlerFor(registry, *promHTTPHandlerOpts)),
@@ -134,10 +138,12 @@ func (receiver *Service) InitGrpcServerMetrics(
 }
 
 func (receiver *Service) GetGrpcClientInterceptors(authClientInterceptor *client.AuthClientInterceptor) {
-	interceptorLogger := itbasisServiceGrpc.InterceptorLogger(log.Logger)
+	logger := zapctx.Default
+
+	interceptorLogger := itbasisServiceGrpc.InterceptorLogger(logger)
 
 	var logOpts []logging.Option
-	if log.Logger.Debug().Enabled() {
+	if logger.Core().Enabled(zapcore.DebugLevel) {
 		logOpts = []logging.Option{
 			logging.WithLogOnEvents(logging.StartCall, logging.FinishCall, logging.PayloadReceived, logging.PayloadSent),
 		}
@@ -159,25 +165,30 @@ func (receiver *Service) GetGrpcClientInterceptors(authClientInterceptor *client
 func (receiver *Service) runGrpcServer(wg *sync.WaitGroup) {
 	grpcServer := receiver.GetGrpcServer()
 
+	logger := zapctx.Default
+	log := logger.Sugar()
+
 	if grpcServerMetrics := receiver.GetGrpcServerMetrics(); grpcServerMetrics != nil {
 		grpcServerMetrics.InitializeMetrics(grpcServer)
 	}
 
-	if log.Debug().Enabled() {
+	if logger.Core().Enabled(zapcore.DebugLevel) {
 		for service, info := range grpcServer.GetServiceInfo() {
-			log.Debug().Msgf("service: %s , info: %+v\n", service, info)
+			log.Debugf("service: %s , info: %+v\n", service, info)
 		}
 	}
 
 	listen, err := net.Listen("tcp4", fmt.Sprintf("%s:%d", receiver.config.GrpcServerHost, receiver.config.GrpcServerPort))
 	if err != nil {
-		log.Panic().Err(err).Send()
+		log.Error(err)
+		log.Panic(fmt.Errorf(msgErrFailedStartGRPCServer, err))
 	}
 
-	log.Info().Msgf("gRPC listen: %s", listen.Addr().String())
+	log.Infof("gRPC listen: %s", listen.Addr().String())
 
 	if err = grpcServer.Serve(listen); err != nil {
-		log.Panic().Err(err).Send()
+		log.Error(err)
+		log.Panic(fmt.Errorf(msgErrFailedStartGRPCServer, err))
 	}
 
 	wg.Done()

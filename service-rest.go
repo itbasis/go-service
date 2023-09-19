@@ -4,22 +4,18 @@ import (
 	"fmt"
 	"sync"
 
-	ginZerolog "github.com/dn365/gin-zerolog"
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/itbasis/go-service/rest"
-	"github.com/rs/zerolog"
-
-	"github.com/rs/zerolog/log"
+	"github.com/itbasis/go-service/v2/rest"
+	"github.com/juju/zaputil/zapctx"
+	"go.uber.org/zap/zapcore"
 )
 
-type HttpController struct {
+type HTTPController struct {
 	Method  string
 	Path    string
 	Handler gin.HandlerFunc
 }
-
-// Deprecated: use HttpController
-type RestController = HttpController
 
 func (receiver *Service) GetGin() *gin.Engine {
 	if receiver.gin == nil {
@@ -29,22 +25,18 @@ func (receiver *Service) GetGin() *gin.Engine {
 	return receiver.gin
 }
 
-// Deprecated: use AddHttpControllers
-func (receiver *Service) AddRestControllers(restControllers ...RestController) {
-	receiver.AddHttpControllers(restControllers...)
-}
-
-func (receiver *Service) AddHttpControllers(httpControllers ...HttpController) {
-	log.Debug().Msgf("REST controllers for adding: %v", httpControllers)
+func (receiver *Service) AddHTTPControllers(httpControllers ...HTTPController) {
+	log := zapctx.Default.Sugar()
+	log.Debugf("REST controllers for adding: %v", httpControllers)
 
 	receiver.ginControllers = append(receiver.ginControllers, httpControllers...)
-	log.Debug().Msgf("REST controllers: %v", receiver.ginControllers)
+	log.Debugf("REST controllers: %v", receiver.ginControllers)
 
-	log.Trace().Msgf("gin: %v", receiver.gin)
+	log.Debugf("gin: %v", receiver.gin)
 
 	if receiver.gin != nil {
 		for _, restController := range httpControllers {
-			log.Debug().Msgf("adding REST controller: %v", restController)
+			log.Debugf("adding REST controller: %v", restController)
 
 			receiver.gin.Handle(restController.Method, restController.Path, restController.Handler)
 		}
@@ -52,35 +44,32 @@ func (receiver *Service) AddHttpControllers(httpControllers ...HttpController) {
 }
 
 func (receiver *Service) initGinServer() {
+	log := zapctx.Default
+
 	receiver.gin = gin.New()
 	receiver.gin.Use(
 		gin.Recovery(),
-		ginZerolog.Logger("rest"),
-		receiver.ginLoggerCtx,
+		ginzap.RecoveryWithZap(zapctx.Default, true),
 	)
 
-	if log.Trace().Enabled() {
-		log.Info().Msg("enable REST request tracing")
+	if log.Core().Enabled(zapcore.DebugLevel) {
+		log.Info("enable REST request tracing")
 
 		receiver.gin.Use(rest.LoggingRequest)
 	}
 
-	log.Debug().Msgf("REST controllers: %v", receiver.ginControllers)
+	log.Debug(fmt.Sprintf("REST controllers: %v", receiver.ginControllers))
 
 	for _, restController := range receiver.ginControllers {
-		log.Debug().Msgf("adding REST controller: %v", restController)
+		log.Debug(fmt.Sprintf("adding REST controller: %v", restController))
 
 		receiver.gin.Handle(restController.Method, restController.Path, restController.Handler)
 	}
 }
 
-func (receiver *Service) ginLoggerCtx(ctx *gin.Context) {
-	log.Trace().Msg("Setting Logger in context")
-
-	zerolog.Ctx(ctx)
-}
-
 func (receiver *Service) runGinServer(wg *sync.WaitGroup) {
+	log := zapctx.Default
+
 	engine := receiver.GetGin()
 
 	if engine == nil {
@@ -90,10 +79,10 @@ func (receiver *Service) runGinServer(wg *sync.WaitGroup) {
 	}
 
 	listen := fmt.Sprintf("%s:%d", receiver.config.RestServerHost, receiver.config.RestServerPort)
-	log.Trace().Msgf("rest listen address: %s", listen)
+	log.Debug(fmt.Sprintf("rest listen address: %s", listen))
 
 	if err := engine.Run(listen); err != nil {
-		log.Panic().Err(err).Send()
+		log.Panic(err.Error())
 	}
 
 	wg.Done()

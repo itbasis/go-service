@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"errors"
@@ -8,13 +9,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/caarlos0/env/v8"
-	coreUtils "github.com/itbasis/go-core-utils"
+	"github.com/caarlos0/env/v9"
+	coreUtils "github.com/itbasis/go-core-utils/v2"
+	"github.com/juju/zaputil/zapctx"
 	"github.com/pressly/goose/v3"
-	"github.com/rs/zerolog/log"
+	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 )
 
 type DB struct {
@@ -30,7 +32,7 @@ type DB struct {
 	hostname string
 }
 
-func NewDB(dbEmbedMigrations *embed.FS) (*DB, error) {
+func NewDB(ctx context.Context, dbEmbedMigrations *embed.FS) (*DB, error) {
 	instance := &DB{
 		dbEmbedMigrations:    dbEmbedMigrations,
 		Config:               &Config{},
@@ -38,20 +40,22 @@ func NewDB(dbEmbedMigrations *embed.FS) (*DB, error) {
 		connSchemaCredential: &Credential{},
 	}
 
-	if err := instance.readEnvironmentConfig(); err != nil {
-		log.Error().Err(err).Msg("error reading data from environment")
+	logger := zapctx.Logger(ctx).Sugar()
+
+	if err := instance.readEnvironmentConfig(ctx); err != nil {
+		logger.Error(fmt.Errorf("error reading data from environment: %w", err))
 
 		return nil, ErrCreateInstance
 	}
 
 	if err := instance.connectDB(); err != nil {
-		log.Error().Err(err).Msg("database connection error")
+		logger.Error(fmt.Errorf("database connection error: %w", err))
 
 		return nil, ErrConnectDB
 	}
 
 	if err := instance.migrationDB(); err != nil {
-		log.Error().Err(err).Msg("database migration error")
+		logger.Error(fmt.Errorf("database migration error: %w", err))
 
 		return instance, ErrDbMigration
 	}
@@ -61,17 +65,18 @@ func NewDB(dbEmbedMigrations *embed.FS) (*DB, error) {
 
 func (receiver *DB) GetGorm() *gorm.DB { return receiver.gorm }
 
-func (receiver *DB) readEnvironmentConfig() error {
-	log.Info().Msg("reading environment...")
+func (receiver *DB) readEnvironmentConfig(ctx context.Context) error {
+	logger := zapctx.Default.Sugar()
+	logger.Info("reading environment...")
 
-	if err := coreUtils.ReadEnvConfig(receiver.Config, nil); err != nil {
-		log.Error().Err(err).Msg("error reading configuration from environment")
+	if err := coreUtils.ReadEnvConfig(ctx, receiver.Config, nil); err != nil {
+		logger.Error(fmt.Errorf("error reading configuration from environment: %w", err))
 
 		return ErrCreateInstance
 	}
 
-	if err := coreUtils.ReadEnvConfig(receiver.connCredential, nil); err != nil {
-		log.Error().Err(err).Msg("error reading credentials from environment")
+	if err := coreUtils.ReadEnvConfig(ctx, receiver.connCredential, nil); err != nil {
+		logger.Error(fmt.Errorf("error reading credentials from environment: %w", err))
 
 		return ErrCreateInstance
 	}
@@ -82,22 +87,22 @@ func (receiver *DB) readEnvironmentConfig() error {
 		Password: receiver.connCredential.Password,
 	}
 
-	if err := coreUtils.ReadEnvConfig(receiver.connSchemaCredential, &env.Options{Prefix: "SCHEMA_"}); err != nil {
-		log.Error().Err(err).Msg("error reading credentials for schema from environment")
+	if err := coreUtils.ReadEnvConfig(ctx, receiver.connSchemaCredential, &env.Options{Prefix: "SCHEMA_"}); err != nil {
+		logger.Error(fmt.Errorf("error reading credentials for schema from environment: %w", err))
 
 		return ErrCreateInstance
 	}
 
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get hostname")
+		logger.Error(fmt.Errorf("failed to get hostname: %w", err))
 
 		return ErrCreateInstance
 	}
 
 	receiver.hostname = hostname
 
-	log.Info().Msg("complete.")
+	logger.Info("complete.")
 
 	return nil
 }
@@ -114,34 +119,35 @@ func (receiver *DB) getDSN(credential Credential) string {
 		receiver.hostname,
 	)
 
-	log.Trace().Msgf("dbConn: %s", dbConn)
+	zapctx.Default.Sugar().Debugf("dbConn: %s", dbConn)
 
 	return dbConn
 }
 
 func (receiver *DB) connectDB() error {
-	log.Info().Msg("connecting to database...")
+	logger := zapctx.Default.Sugar()
+	logger.Info("connecting to database...")
 
-	gormLogLevel := logger.Warn
-	if log.Debug().Enabled() {
-		gormLogLevel = logger.Info
+	gormLogLevel := gormLogger.Warn
+	if logger.Desugar().Core().Enabled(zapcore.DebugLevel) {
+		gormLogLevel = gormLogger.Info
 	}
 
 	gormDB, err := gorm.Open(
 		postgres.Open(receiver.getDSN(*receiver.connCredential)),
 		&gorm.Config{
-			Logger: logger.Default.LogMode(gormLogLevel),
+			Logger: gormLogger.Default.LogMode(gormLogLevel),
 		},
 	)
 	if err != nil {
-		log.Error().Err(err).Send()
+		logger.Error(err)
 
 		return ErrConnectDB
 	}
 
 	db, err := gormDB.DB()
 	if err != nil {
-		log.Error().Err(err).Send()
+		logger.Error(err)
 
 		return ErrConnectDB
 	}
@@ -152,12 +158,12 @@ func (receiver *DB) connectDB() error {
 
 	var version string
 	if res := gormDB.Raw("SELECT VERSION();").First(&version); res.Error != nil {
-		log.Error().Err(res.Error).Send()
+		logger.Error(res.Error)
 
 		return ErrConnectDB
 	}
 
-	log.Info().Msgf("Database version: %s", version)
+	logger.Infof("Database version: %s", version)
 
 	receiver.gorm = gormDB
 
@@ -165,40 +171,42 @@ func (receiver *DB) connectDB() error {
 }
 
 func (receiver *DB) migrationDB() error {
+	logger := zapctx.Default.Sugar()
+
 	migrationDir, err := receiver.prepareMigrationDB()
 	if err != nil {
-		log.Error().Err(err).Msg("database migration error")
+		logger.Error(fmt.Errorf("database migration error: %w", err))
 
 		return err
 	} else if len(migrationDir) == 0 {
-		log.Warn().Msg("Source for database migration not found - migration skipped")
+		logger.Warn("Source for database migration not found - migration skipped")
 
 		return nil
 	}
 
-	log.Info().Msgf("Directory with database migrations: %s", migrationDir)
+	logger.Infof("Directory with database migrations: %s", migrationDir)
 
 	// We connect to the database with the rights to edit the database schema
 	sqlDb, err := sql.Open(receiver.Config.Dialect, receiver.getDSN(*receiver.connSchemaCredential))
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to database to run migrations")
+		logger.Error(fmt.Errorf("failed to connect to database to run migrations: %w", err))
 
 		return ErrDbMigration
 	}
 
 	defer func() {
 		if err := sqlDb.Close(); err != nil {
-			log.Error().Err(err).Msg("failed to disconnect from database")
+			logger.Error(fmt.Errorf("failed to disconnect from database: %w", err))
 		}
 	}()
 
 	if err = goose.Up(sqlDb, migrationDir, goose.WithAllowMissing()); err != nil {
-		log.Error().Err(err).Send()
+		logger.Error(err)
 
 		return ErrDbMigration
 	}
 
-	log.Info().Msg("Database migration completed")
+	logger.Info("Database migration completed")
 
 	return nil
 }
@@ -208,8 +216,10 @@ func (receiver *DB) prepareMigrationDB() (string, error) {
 		return "", err //nolint:wrapcheck
 	}
 
+	logger := zapctx.Default.Sugar()
+
 	if receiver.dbEmbedMigrations != nil {
-		log.Debug().Msg("Configure Goose using embedded FS for migrations")
+		logger.Debug("Configure Goose using embedded FS for migrations")
 
 		goose.SetBaseFS(receiver.dbEmbedMigrations)
 
@@ -221,12 +231,12 @@ func (receiver *DB) prepareMigrationDB() (string, error) {
 		// Checking the availability of the directory with database migrations
 		_, err := os.Stat(migrationDir)
 		if errors.Is(err, os.ErrNotExist) {
-			log.Error().Err(err).Msgf("Directory with database migrations not found: %s", migrationDir)
+			logger.Error(fmt.Errorf("directory '%s' with database migrations not found: %w", migrationDir, err))
 
 			return "", err //nolint:wrapcheck
 		}
 
-		log.Info().Msgf("Directory with database migrations: %s", migrationDir)
+		logger.Infof("Directory with database migrations: %s", migrationDir)
 	}
 
 	return migrationDir, nil

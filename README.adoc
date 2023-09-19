@@ -8,7 +8,7 @@ Possibilities:
 . Running a gRPC server with metrics for Prometheus (see link:config.go#L14[config] and link:https://github.com/grpc-ecosystem/go-grpc-middleware/blob/main/providers/prometheus/options.go[options])
 . Working with the database via link:https://gorm.io/[GORM] with support for database migration via link:https://pressly.github.io/goose/[Goose] with the ability to specify migration files from the file system or via `embed.FS`
 . Using the link:https://github.com/go-co-op/gocron[gocron] task scheduler
-. Different log output format based on link:https://github.com/rs/zerolog[Zerolog], depending on the launch environment - launch in container or not
+. Different log output format based on link:https://github.com/uber-go/zap[Zap], depending on the launch environment - launch in container or not
 . Getting settings via link:https://github.com/caarlos0/env[environment] variables
 
 == Configuration files
@@ -29,7 +29,7 @@ see link:TODO.adoc[]
 [source,go]
 ----
 func main() {
-	_ := NewServiceWithEnvironment().Run()
+	_ := NewServiceWithEnvironment(context.Background(), zap.NewProductionConfig()).Run()
 }
 ----
 
@@ -42,7 +42,7 @@ import "embed"
 var embedMigrations embed.FS
 
 func main(){
-	_ := NewServiceWithEnvironment().
+	_ := NewServiceWithEnvironment(context.Background(), zap.NewProductionConfig()).
 		InitDB(&embedMigrations).
 		Run()
 }
@@ -57,7 +57,7 @@ import "embed"
 var embedMigrations embed.FS
 
 func main(){
-	srv := NewServiceWithEnvironment()
+	srv := NewServiceWithEnvironment(context.Background(), zap.NewProductionConfig())
 	gormDB := srv.GetGormWithEmbeddedMigrations(&embedMigrations)
 
 	srv.Run()
@@ -71,7 +71,7 @@ func main(){
 import grpcPrometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 
 func main() {
-	_ := NewServiceWithEnvironment().
+	_ := NewServiceWithEnvironment(context.Background(), zap.NewProductionConfig()).
 		InitGrpcServerMetrics(grpcPrometheus.WithServerHandlingTimeHistogram()).
 		Run()
 }

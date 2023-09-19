@@ -1,23 +1,26 @@
 package service
 
 import (
+	"context"
 	"embed"
 
-	"github.com/itbasis/go-service/db"
-	"github.com/rs/zerolog/log"
+	"github.com/itbasis/go-service/v2/db"
+	"github.com/juju/zaputil/zapctx"
 	"gorm.io/gorm"
 )
 
-func (receiver *Service) InitDB(dbEmbedMigrations *embed.FS) *Service {
+func (receiver *Service) InitDB(ctx context.Context, dbEmbedMigrations *embed.FS) *Service {
+	log := zapctx.Logger(ctx).Sugar()
+
 	if receiver.config.DbGormDisabled {
-		log.Info().Msg(gormIsDisabled)
+		log.Info(gormIsDisabled)
 
 		return receiver
 	}
 
-	newDB, err := db.NewDB(dbEmbedMigrations)
+	newDB, err := db.NewDB(ctx, dbEmbedMigrations)
 	if err != nil {
-		log.Panic().Err(err).Send()
+		log.Panic(err)
 	}
 
 	receiver.gorm = newDB
@@ -25,23 +28,23 @@ func (receiver *Service) InitDB(dbEmbedMigrations *embed.FS) *Service {
 	return receiver
 }
 
-func (receiver *Service) GetGorm() *gorm.DB {
-	return receiver.GetGormWithEmbeddedMigrations(nil)
+func (receiver *Service) GetGorm(ctx context.Context) *gorm.DB {
+	return receiver.GetGormWithEmbeddedMigrations(ctx, nil)
 }
 
-func (receiver *Service) GetGormWithEmbeddedMigrations(dbEmbedMigrations *embed.FS) *gorm.DB {
+func (receiver *Service) GetGormWithEmbeddedMigrations(ctx context.Context, dbEmbedMigrations *embed.FS) *gorm.DB {
 	if receiver.gorm != nil {
 		return receiver.gorm.GetGorm()
 	}
 
 	if receiver.config.DbGormDisabled {
-		log.Error().Msg(gormIsDisabled)
+		zapctx.Logger(ctx).Info(gormIsDisabled)
 
 		return nil
 	}
 
 	if receiver.gorm == nil {
-		receiver.InitDB(dbEmbedMigrations)
+		receiver.InitDB(ctx, dbEmbedMigrations)
 	}
 
 	return receiver.gorm.GetGorm()

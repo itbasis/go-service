@@ -39,7 +39,6 @@ linters:
     - prealloc
     - promlinter
     - revive
-    - structcheck
     - wastedassign
     - tagliatelle
     - tenv
@@ -53,7 +52,7 @@ linters:
     - wrapcheck
     - wsl
     - ginkgolinter
-#    - interfacebloat
+    - interfacebloat
 
 linters-settings:
   varnamelen:

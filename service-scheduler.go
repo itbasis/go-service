@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/go-co-op/gocron"
-	"github.com/itbasis/go-service/utils/time"
-	"github.com/rs/zerolog/log"
+	"github.com/itbasis/go-service/v2/utils/time"
+	"github.com/juju/zaputil/zapctx"
 )
 
 func (receiver *Service) GetScheduler() *gocron.Scheduler {
@@ -12,7 +12,7 @@ func (receiver *Service) GetScheduler() *gocron.Scheduler {
 	}
 
 	if receiver.scheduler == nil {
-		log.Warn().Msg("scheduler is not enabled")
+		zapctx.Default.Sugar().Warn("scheduler is not enabled")
 	}
 
 	return receiver.scheduler

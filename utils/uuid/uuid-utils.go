@@ -2,24 +2,22 @@ package uuid
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/rs/zerolog"
+	"github.com/juju/zaputil/zapctx"
+	"github.com/pkg/errors"
 )
 
-var ErrParsingUUID = errors.New("error parsing string to UUID")
-
 func String2UUID(ctx context.Context, value string) (uuid.UUID, error) {
-	logger := zerolog.Ctx(ctx)
-	logger.Debug().Msgf("value: %s", value)
+	logger := zapctx.Logger(ctx).Sugar()
+	logger.Debugf("value: %s", value)
 
 	result, err := uuid.FromString(value)
 	if err != nil {
 		msg := fmt.Errorf("%w: '%s'", ErrParsingUUID, value)
 
-		logger.Error().Err(err).Msg(msg.Error())
+		logger.Error(errors.Wrapf(err, msg.Error()))
 
 		return uuid.Nil, msg
 	}

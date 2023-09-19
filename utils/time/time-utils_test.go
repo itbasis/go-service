@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	serviceTimeUtils "github.com/itbasis/go-service/utils/time"
+	serviceTimeUtils "github.com/itbasis/go-service/v2/utils/time"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -35,6 +35,7 @@ var _ = Describe(
 		for idx, test := range testData {
 			It(
 				fmt.Sprintf("#%d: %s", idx, test.string), func() {
+					//nolint:gosec
 					Ω(serviceTimeUtils.String2Time(context.Background(), &test.string)).To(HaveValue(Equal(test.time)))
 				},
 			)

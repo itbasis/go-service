@@ -29,7 +29,7 @@ ij_go_move_all_imports_in_one_declaration = true
 ij_go_run_go_fmt_on_reformat = true
 ij_go_call_parameters_wrap = on_every_item
 
-[*.yml]
+[{{*.yml,*.yaml}}]
 tab_width = 2
 ij_wrap_on_typing = false
 ij_yaml_keep_indents_on_empty_lines = false

@@ -1,4 +1,4 @@
-package time_test
+package files_test
 
 import (
 	"testing"
@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestTimeUtils(t *testing.T) {
+func TestFilesUtils(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecs(t, "TimeUtils")
+	RunSpecs(t, "Files Utils")
 }
