@@ -12,11 +12,11 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0
 	github.com/itbasis/go-clock v1.5.0
 	github.com/itbasis/go-core-utils/v2 v2.2.2
-	github.com/itbasis/go-jwt-auth/v2 v2.0.0-rc
-	github.com/itbasis/go-log-utils/v2 v2.1.1
-	github.com/itbasis/go-test-utils/v2 v2.2.2
+	github.com/itbasis/go-jwt-auth/v2 v2.0.0-rc2
+	github.com/itbasis/go-log-utils/v2 v2.2.0
+	github.com/itbasis/go-test-utils/v2 v2.3.0
 	github.com/juju/zaputil v0.0.0-20190326175239-ef53049637ac
-	github.com/onsi/ginkgo/v2 v2.12.0
+	github.com/onsi/ginkgo/v2 v2.12.1
 	github.com/onsi/gomega v1.27.10
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose/v3 v3.15.0

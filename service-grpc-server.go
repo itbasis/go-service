@@ -78,7 +78,7 @@ func (receiver *Service) initGrpcServer() {
 
 	unaryInterceptors := grpc.ChainUnaryInterceptor(
 		logging.UnaryServerInterceptor(interceptorLogger, logOpts...),
-		grpcLogUtils.GrpcLogUnaryServerInterceptor(),
+		grpcLogUtils.LogUnaryServerInterceptor(),
 		auth.UnaryServerInterceptor(authFunc),
 	)
 	streamInterceptors := grpc.ChainStreamInterceptor(
