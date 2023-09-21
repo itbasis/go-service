@@ -13,7 +13,7 @@ require (
 	github.com/itbasis/go-clock v1.5.0
 	github.com/itbasis/go-core-utils/v2 v2.2.2
 	github.com/itbasis/go-jwt-auth/v2 v2.0.0-rc2
-	github.com/itbasis/go-log-utils/v2 v2.2.0
+	github.com/itbasis/go-log-utils/v2 v2.2.1
 	github.com/itbasis/go-test-utils/v2 v2.3.0
 	github.com/juju/zaputil v0.0.0-20190326175239-ef53049637ac
 	github.com/onsi/ginkgo/v2 v2.12.1
@@ -75,7 +75,7 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
