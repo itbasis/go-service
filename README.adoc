@@ -4,6 +4,7 @@ image:https://img.shields.io/github/checks-status/itbasis/go-service/main[GitHub
 image:https://img.shields.io/github/go-mod/go-version/itbasis/go-service[GitHub go.mod Go version]
 image:https://img.shields.io/badge/godoc-reference-blue.svg[link=https://pkg.go.dev/github.com/itbasis/go-service]
 image:https://img.shields.io/github/v/release/itbasis/go-service?include_prereleases[GitHub release (release name instead of tag name)]
+https://codecov.io/gh/itbasis/go-service[image:https://codecov.io/gh/itbasis/go-service/graph/badge.svg?token=GCqCXxG0xL[codecov]]
 https://goreportcard.com/report/github.com/itbasis/go-hashtag[image:https://goreportcard.com/badge/github.com/itbasis/go-hashtag[Go Report Card]]
 
 
