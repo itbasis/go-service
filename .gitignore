@@ -3,9 +3,9 @@ tmp.*
 
 # Go
 bin/
-report.xml
-coverage.out
-coverage-*.out
+junit-report.xml
+.coverage.out
+.coverage-*.out
 
 # JetBrains
 .idea/*
