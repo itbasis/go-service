@@ -2,9 +2,7 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"embed"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -12,7 +10,6 @@ import (
 	"github.com/caarlos0/env/v9"
 	coreUtils "github.com/itbasis/go-core-utils/v2"
 	"github.com/juju/zaputil/zapctx"
-	"github.com/pressly/goose/v3"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -168,76 +165,4 @@ func (receiver *DB) connectDB() error {
 	receiver.gorm = gormDB
 
 	return nil
-}
-
-func (receiver *DB) migrationDB() error {
-	logger := zapctx.Default.Sugar()
-
-	migrationDir, err := receiver.prepareMigrationDB()
-	if err != nil {
-		logger.Error(fmt.Errorf("database migration error: %w", err))
-
-		return err
-	} else if len(migrationDir) == 0 {
-		logger.Warn("Source for database migration not found - migration skipped")
-
-		return nil
-	}
-
-	logger.Infof("Directory with database migrations: %s", migrationDir)
-
-	// We connect to the database with the rights to edit the database schema
-	sqlDb, err := sql.Open(receiver.Config.Dialect, receiver.getDSN(*receiver.connSchemaCredential))
-	if err != nil {
-		logger.Error(fmt.Errorf("failed to connect to database to run migrations: %w", err))
-
-		return ErrDbMigration
-	}
-
-	defer func() {
-		if err := sqlDb.Close(); err != nil {
-			logger.Error(fmt.Errorf("failed to disconnect from database: %w", err))
-		}
-	}()
-
-	if err = goose.Up(sqlDb, migrationDir, goose.WithAllowMissing()); err != nil {
-		logger.Error(err)
-
-		return ErrDbMigration
-	}
-
-	logger.Info("Database migration completed")
-
-	return nil
-}
-
-func (receiver *DB) prepareMigrationDB() (string, error) {
-	if err := goose.SetDialect(receiver.Config.Dialect); err != nil {
-		return "", err //nolint:wrapcheck
-	}
-
-	logger := zapctx.Default.Sugar()
-
-	if receiver.dbEmbedMigrations != nil {
-		logger.Debug("Configure Goose using embedded FS for migrations")
-
-		goose.SetBaseFS(receiver.dbEmbedMigrations)
-
-		return "migrations", nil
-	}
-
-	migrationDir := receiver.Config.GooseMigrationDir
-	if len(migrationDir) != 0 {
-		// Checking the availability of the directory with database migrations
-		_, err := os.Stat(migrationDir)
-		if errors.Is(err, os.ErrNotExist) {
-			logger.Error(fmt.Errorf("directory '%s' with database migrations not found: %w", migrationDir, err))
-
-			return "", err //nolint:wrapcheck
-		}
-
-		logger.Infof("Directory with database migrations: %s", migrationDir)
-	}
-
-	return migrationDir, nil
 }

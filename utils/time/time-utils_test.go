@@ -36,7 +36,7 @@ var _ = Describe(
 			It(
 				fmt.Sprintf("#%d: %s", idx, test.string), func() {
 					//nolint:gosec
-					Ω(serviceTimeUtils.String2Time(context.Background(), &test.string)).To(HaveValue(Equal(test.time)))
+					Ω(serviceTimeUtils.String2Time(context.Background(), &test.string)).To(HaveValue(BeEquivalentTo(test.time)))
 				},
 			)
 		}
