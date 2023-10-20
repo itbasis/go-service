@@ -13,7 +13,7 @@ require (
 	github.com/itbasis/go-clock v1.5.1
 	github.com/itbasis/go-core-utils/v2 v2.2.3
 	github.com/itbasis/go-jwt-auth/v2 v2.0.0
-	github.com/itbasis/go-log-utils/v2 v2.2.3
+	github.com/itbasis/go-log-utils/v2 v2.2.4
 	github.com/itbasis/go-test-utils/v2 v2.3.2
 	github.com/juju/zaputil v0.0.0-20190326175239-ef53049637ac
 	github.com/onsi/ginkgo/v2 v2.13.0

@@ -81,8 +81,8 @@ github.com/itbasis/go-docker-utils/v2 v2.1.2 h1:s8+onWG5bCYzkQcAjwXQiqmOsy7UOX3C
 github.com/itbasis/go-docker-utils/v2 v2.1.2/go.mod h1:XdO8NKzuM51R4YBM2tuw8qSnRX3y9xjx9VMGB565grk=
 github.com/itbasis/go-jwt-auth/v2 v2.0.0 h1:m/UoG4YBrd4BFeYO0+j+EFXQ+P/jwoNkafZSwdz/QlQ=
 github.com/itbasis/go-jwt-auth/v2 v2.0.0/go.mod h1:SImagyLmvp0CRfXCvEkgV83sBKnMo64qQvYUJKhJlW4=
-github.com/itbasis/go-log-utils/v2 v2.2.3 h1:z/M800nrjrlV2hhCvBBU1qO/7CVMEz0Not8/ocsEIko=
-github.com/itbasis/go-log-utils/v2 v2.2.3/go.mod h1:Jo8X54/Neeh1mFxRgeVUfzjLcZPS1zb/gnsbcysd15g=
+github.com/itbasis/go-log-utils/v2 v2.2.4 h1:m/Zsl2LlaKKQgOnUqZgsTsjY4u6JJyKPchGypVJAG2A=
+github.com/itbasis/go-log-utils/v2 v2.2.4/go.mod h1:JRHEb4d+rFqLDJckM8+9/q10geweHMLvrp6P2TVR/ZY=
 github.com/itbasis/go-test-utils/v2 v2.3.2 h1:OE2XxC/jzcxion1ZjzLfJbUL84xur0NV6ljd1PEW2DE=
 github.com/itbasis/go-test-utils/v2 v2.3.2/go.mod h1:/I0FSoHRVlPp4fRuDqMclW0OlNk1cV0fPqQbRgJ5VBU=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
