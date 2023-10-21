@@ -5,8 +5,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	itbasisServiceUtilsUUID "github.com/itbasis/go-service/v2/utils/uuid"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2" //nolint:revive
+	. "github.com/onsi/gomega"    //nolint:revive
 )
 
 var _ = Describe(

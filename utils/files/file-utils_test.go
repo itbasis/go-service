@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/itbasis/go-service/v2/utils/files"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2" //nolint:revive
+	. "github.com/onsi/gomega"    //nolint:revive
 )
 
 var _ = DescribeTable(
