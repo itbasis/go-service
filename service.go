@@ -8,7 +8,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/itbasis/go-clock"
-	coreUtils "github.com/itbasis/go-core-utils/v2"
+	itbasisCoreUtilsEnvReader "github.com/itbasis/go-core-utils/v2/env-reader"
 	jwtToken "github.com/itbasis/go-jwt-auth/v2/jwt-token"
 	logUtils "github.com/itbasis/go-log-utils/v2"
 	"github.com/itbasis/go-service/v2/db"
@@ -38,7 +38,7 @@ func NewServiceWithEnvironment(ctx context.Context, zapConfig zap.Config) *Servi
 	logUtils.ConfigureDefaultContextLogger(false, zapConfig)
 
 	config := &Config{}
-	if err := coreUtils.ReadEnvConfig(ctx, config, nil); err != nil {
+	if err := itbasisCoreUtilsEnvReader.ReadEnvConfig(ctx, config, nil); err != nil {
 		zapctx.Default.Sugar().Panic(err)
 	}
 

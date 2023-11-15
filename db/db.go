@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/caarlos0/env/v9"
-	coreUtils "github.com/itbasis/go-core-utils/v2"
+	"github.com/caarlos0/env/v10"
+	itbasisCoreUtilsEnvReader "github.com/itbasis/go-core-utils/v2/env-reader"
 	"github.com/juju/zaputil/zapctx"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/postgres"
@@ -66,13 +66,13 @@ func (receiver *DB) readEnvironmentConfig(ctx context.Context) error {
 	logger := zapctx.Default.Sugar()
 	logger.Info("reading environment...")
 
-	if err := coreUtils.ReadEnvConfig(ctx, receiver.Config, nil); err != nil {
+	if err := itbasisCoreUtilsEnvReader.ReadEnvConfig(ctx, receiver.Config, nil); err != nil {
 		logger.Error(fmt.Errorf("error reading configuration from environment: %w", err))
 
 		return ErrCreateInstance
 	}
 
-	if err := coreUtils.ReadEnvConfig(ctx, receiver.connCredential, nil); err != nil {
+	if err := itbasisCoreUtilsEnvReader.ReadEnvConfig(ctx, receiver.connCredential, nil); err != nil {
 		logger.Error(fmt.Errorf("error reading credentials from environment: %w", err))
 
 		return ErrCreateInstance
@@ -84,7 +84,7 @@ func (receiver *DB) readEnvironmentConfig(ctx context.Context) error {
 		Password: receiver.connCredential.Password,
 	}
 
-	if err := coreUtils.ReadEnvConfig(ctx, receiver.connSchemaCredential, &env.Options{Prefix: "SCHEMA_"}); err != nil {
+	if err := itbasisCoreUtilsEnvReader.ReadEnvConfig(ctx, receiver.connSchemaCredential, &env.Options{Prefix: "SCHEMA_"}); err != nil {
 		logger.Error(fmt.Errorf("error reading credentials for schema from environment: %w", err))
 
 		return ErrCreateInstance
