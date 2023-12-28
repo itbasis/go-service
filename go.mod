@@ -20,7 +20,7 @@ require (
 	github.com/onsi/gomega v1.30.0
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose/v3 v3.17.0
-	github.com/prometheus/client_golang v1.17.0
+	github.com/prometheus/client_golang v1.18.0
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.60.1
 	gorm.io/driver/postgres v1.5.4
