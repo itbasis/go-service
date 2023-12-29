@@ -46,7 +46,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20231212022811-ec68065c825e // indirect
+	github.com/google/pprof v0.0.0-20231229022155-5aaadb5f27d9 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/itbasis/go-docker-utils/v2 v2.1.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
