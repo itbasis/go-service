@@ -10,7 +10,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
-	github.com/itbasis/go-clock v1.5.1
+	github.com/itbasis/go-clock v1.6.0
 	github.com/itbasis/go-core-utils/v2 v2.3.1
 	github.com/itbasis/go-jwt-auth/v2 v2.1.0
 	github.com/itbasis/go-log-utils/v2 v2.3.1
