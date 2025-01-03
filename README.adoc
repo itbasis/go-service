@@ -7,6 +7,7 @@ image:https://img.shields.io/github/v/tag/itbasis/go-service[GitHub tag (with fi
 https://codecov.io/gh/itbasis/go-service[image:https://codecov.io/gh/itbasis/go-service/graph/badge.svg?token=GCqCXxG0xL[codecov]]
 https://goreportcard.com/report/github.com/itbasis/go-hashtag[image:https://goreportcard.com/badge/github.com/itbasis/go-hashtag[Go Report Card]]
 
+IMPORTANT: The project has moved to another repository: https://github.com/itbasis/go-tools
 
 Possibilities:
 
